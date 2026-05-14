@@ -6,6 +6,8 @@
     <title>Smile Pay Demos</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    
     <style>
         :root {
             --bg-color: #050505; 
@@ -74,7 +76,7 @@
             margin-bottom: 20px;
         }
 
-        /* Nuovi stili per i box della demo */
+        /* Stili per i box della demo */
         .demo-cases {
             background: #111111;
             border: 1px solid #222222;
@@ -126,6 +128,14 @@
             display: block;
             margin-bottom: 8px;
         }
+
+        /* Personalizzazione opzionale dei colori del widget n8n */
+        :root {
+            --chat--color-primary: var(--accent-yellow);
+            --chat--color-secondary: #222222;
+            --chat--color-background: #111111;
+            --chat--color-font: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -163,19 +173,15 @@
         </p>
     </div>
 
-    <script type="text/javascript">
-    (function(){
-      window.vvc_ready_handlers = [];
-      window.vivocha = {
-        ready: function(cb) { window.vvc_ready_handlers.push(cb); },
-        setOptions: function(opts) { window.vvc_options = opts}
-      };
-      var t = document.createElement("script");
-      t.type="text/javascript"; t.async=true;
-      t.src="//www.vivocha.com/a/smilecx_test/api/vivocha.js";
-      var n=document.getElementsByTagName("script")[0];
-      n.parentNode.insertBefore(t,n);
-    })();
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://studio-live.us-1.smile.cx/webhook/8853c738-4988-40ee-97cb-c5d0ff37b70c/chat',
+            initialMessages: [
+                'Hello, I\'m Gaia, your County Assistant powered by Smile Pay. How can I help you today?'
+            ]
+        });
     </script>
 </body>
 </html>
