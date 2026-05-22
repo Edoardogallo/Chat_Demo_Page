@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smile Pay Demos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --bg-color: #050505; 
+            --text-main: #ffffff; 
+            --text-muted: #a1a1aa; 
+            --accent-yellow: #facc15; 
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            border-bottom: 1px solid #222;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-img {
+            height: 35px; 
+            width: auto;
+        }
+
+        .contact-btn {
+            background-color: var(--accent-yellow);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero {
+            max-width: 800px;
+            margin: 100px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 54px;
+            line-height: 1.1;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Stili per i box della demo */
+        .demo-cases {
+            background: #111111;
+            border: 1px solid #222222;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .demo-cases h3 {
+            margin-top: 0;
+            font-size: 18px;
+            color: var(--accent-yellow);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .demo-cases ul {
+            padding-left: 20px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .demo-cases li span {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .troubleshoot-box {
+            background: rgba(250, 204, 21, 0.05);
+            border-left: 4px solid var(--accent-yellow);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 40px;
+        }
+
+        .troubleshoot-box p {
+            margin: 0;
+            font-size: 15px;
+            color: #d4d4d8;
+            line-height: 1.6;
+        }
+
+        .troubleshoot-box b {
+            color: var(--accent-yellow);
+            font-size: 16px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Personalizzazione opzionale dei colori del widget n8n */
+        :root {
+            --chat--color-primary: var(--accent-yellow);
+            --chat--color-secondary: #222222;
+            --chat--color-background: #111111;
+            --chat--color-font: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <img src="https://framerusercontent.com/images/pATii8Ab5f2gq7zr9kJHHDCaz0U.png?scale-down-to=512&width=1283&height=215" alt="Smile.CX Logo" class="logo-img">
+        </div>
+        <button class="contact-btn">Contact us ↗</button>
+    </header>
+
+    <div class="hero">
+        <h1>AI-Powered Government Services.</h1>
+        <p class="subtitle">
+            Welcome to the <b>Smile Pay</b> interactive demo. Test how our conversational agent, Gaia, securely verifies citizen identities, processes payments, and resolves issues in real-time.
+        </p>
+        
+        <div class="demo-cases">
+            <h3>Try asking Gaia for assistance:</h3>
+            <ul>
+                <li><span>"I need to pay my property taxes."</span></li>
+                <li><span>"I want to renew my vehicle registration."</span></li>
+                <li><span>"Can you help me pay a parking ticket?"</span></li>
+                <li><span>"I'd like to purchase an annual hunting license."</span></li>
+            </ul>
+        </div>
+
+        <div class="troubleshoot-box">
+            <p><b>💡 Test the Troubleshooting capability:</b>
+            During the payment flow, try typing <i>"The payment link is broken"</i> or <i>"I can't open the link."</i> Watch how Gaia proactively attempts to resolve the technical issue before routing you to a human agent.</p>
+        </div>
+
+        <p class="subtitle" style="font-size: 16px;">
+            <i>Click the chat icon in the bottom right corner to start your demo.</i>
+        </p>
+    </div>
+
+    <script>
+        localStorage.clear();
+        sessionStorage.clear();
+    </script>
+
+    <script type="module">
+        import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+        createChat({
+            webhookUrl: 'https://studio-live.us-1.smile.cx/webhook/8853c738-4988-40ee-97cb-c5d0ff37b70c/chat',
+            initialMessages: [
+                'Hello, I\'m Gaia, your County Assistant powered by Smile Pay. How can I help you today?'
+            ]
+        });
+    </script>
+    <script type="text/javascript">
+(function(){
+  window.vvc_ready_handlers = [];
+  window.vivocha = {
+    ready: function(cb) { window.vvc_ready_handlers.push(cb); },
+    setOptions: function(opts) { window.vvc_options = opts}
+  };
+  window.vivocha.setOptions({
+    campaignId: "6932b7a37d8c3a00068ba3e4"
+  });
+  var t = document.createElement("script");
+  t.type="text/javascript"; t.async=true;
+  t.src="//www.vivocha.com/a/smilecx_test/api/vivocha.js";
+  var n=document.getElementsByTagName("script")[0];
+  n.parentNode.insertBefore(t,n);
+})();
+</script>
+</body>
+</html>
