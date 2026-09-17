@@ -15,10 +15,11 @@
 
 <script>
 const WEBHOOK = 'https://studio-live.us-1.smile.cx/webhook/tab-recording';
+const VIEWER = 'https://studio-live.us-1.smile.cx/webhook/tab-recording-view';
 const btn = document.getElementById('rec');
 const status = document.getElementById('status');
 const cid = new URLSearchParams(location.search).get('cid') || 'unknown';
-let rec, session, index, queue;
+let rec, session, index, queue, localChunks, failed;
 
 if (document.featurePolicy && !document.featurePolicy.allowsFeature('display-capture')) {
   btn.disabled = true;
@@ -33,7 +34,22 @@ function upload(blob) {
       body: blob,
     }))
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); })
-    .catch(err => { status.textContent = `Chunk ${i} failed: ${err.message}`; });
+    .catch(err => { failed++; console.error(`Chunk ${i} failed`, err); });
+}
+
+async function compare(localBlob) {
+  const r = await fetch(`${VIEWER}?session=${session}`);
+  const remoteSize = r.ok ? (await r.arrayBuffer()).byteLength : -1;
+  const info = {
+    session,
+    chunks: localChunks.length,
+    localSize: localBlob.size,
+    remoteSize,
+    failed,
+    match: localBlob.size === remoteSize,
+  };
+  console.table(info);
+  return info;
 }
 
 btn.onclick = async () => {
@@ -48,16 +64,36 @@ btn.onclick = async () => {
 
     session = `${cid}_${Date.now()}`;
     index = 0;
+    failed = 0;
+    localChunks = [];
     queue = Promise.resolve();
+    document.getElementById('preview')?.remove();
 
     rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
-    rec.ondataavailable = e => e.data.size && upload(e.data);
+    rec.ondataavailable = e => {
+      if (!e.data.size) return;
+      localChunks.push(e.data);
+      upload(e.data);
+    };
     rec.onstop = async () => {
       stream.getTracks().forEach(t => t.stop());
       btn.textContent = '● Start recording';
       status.textContent = 'Finishing upload...';
       await queue;
-      if (!status.textContent.includes('failed')) status.textContent = `Saved as ${session}.webm`;
+
+      const localBlob = new Blob(localChunks, { type: 'video/webm' });
+      window.lastRecording = localBlob;
+
+      const v = document.createElement('video');
+      v.id = 'preview';
+      v.controls = true;
+      v.style.cssText = 'max-width:100%;margin-top:12px;display:block';
+      v.src = URL.createObjectURL(localBlob);
+      document.body.appendChild(v);
+
+      const info = await compare(localBlob);
+      status.textContent = `${session}.webm — ${info.chunks} chunks, local ${info.localSize} B, n8n ${info.remoteSize} B, failed ${info.failed}` +
+        (info.match ? ' ✓' : ' ✗ mismatch');
     };
     stream.getVideoTracks()[0].onended = () => rec.state === 'recording' && rec.stop();
 
