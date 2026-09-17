@@ -14,15 +14,26 @@
 <div id="status"></div>
 
 <script>
+const WEBHOOK = 'https://studio-live.us-1.smile.cx/webhook/tab-recording';
 const btn = document.getElementById('rec');
 const status = document.getElementById('status');
 const cid = new URLSearchParams(location.search).get('cid') || 'unknown';
-const base = location.pathname.includes('/webhook-test/') ? '/webhook-test' : '/webhook';
-let rec, chunks = [];
+let rec, session, index, queue;
 
 if (document.featurePolicy && !document.featurePolicy.allowsFeature('display-capture')) {
   btn.disabled = true;
   status.textContent = 'display-capture not allowed on this iframe';
+}
+
+function upload(blob) {
+  const i = index++;
+  queue = queue
+    .then(() => fetch(`${WEBHOOK}?cid=${encodeURIComponent(cid)}&session=${session}&i=${i}`, {
+      method: 'POST',
+      body: blob,
+    }))
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); })
+    .catch(err => { status.textContent = `Chunk ${i} failed: ${err.message}`; });
 }
 
 btn.onclick = async () => {
@@ -35,21 +46,18 @@ btn.onclick = async () => {
       selfBrowserSurface: 'include',
     });
 
+    session = `${cid}_${Date.now()}`;
+    index = 0;
+    queue = Promise.resolve();
+
     rec = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
-    rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+    rec.ondataavailable = e => e.data.size && upload(e.data);
     rec.onstop = async () => {
       stream.getTracks().forEach(t => t.stop());
       btn.textContent = '● Start recording';
-      status.textContent = 'Uploading...';
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      chunks = [];
-      const res = await fetch(`${base}/tab-recording?cid=${encodeURIComponent(cid)}`, {
-        method: 'POST',
-        body: blob,
-      });
-      status.textContent = res.ok
-        ? `Uploaded (${(blob.size / 1048576).toFixed(1)} MB)`
-        : `Upload failed: ${res.status}`;
+      status.textContent = 'Finishing upload...';
+      await queue;
+      if (!status.textContent.includes('failed')) status.textContent = `Saved as ${session}.webm`;
     };
     stream.getVideoTracks()[0].onended = () => rec.state === 'recording' && rec.stop();
 
